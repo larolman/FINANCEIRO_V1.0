@@ -14,7 +14,7 @@ public interface ContaPagarDAO {
 	
 	public void cancelarConta(Long id_conta) throws SQLException, OperacaoContaException;
 	
-	public ContaPagar buscarConta(ContaPagar contaPagar) throws SQLException, OperacaoContaException;
+	public ContaPagar buscarConta(Long id_conta) throws SQLException, OperacaoContaException;
 	
 	public List<ContaPagar> buscarTodas() throws SQLException, OperacaoContaException;
 

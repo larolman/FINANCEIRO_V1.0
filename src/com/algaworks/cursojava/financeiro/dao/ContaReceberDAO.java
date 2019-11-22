@@ -14,7 +14,7 @@ public interface ContaReceberDAO {
 	
 	public void cancelar(Long  id_conta) throws SQLException, OperacaoContaException;
 	
-	public ContaReceber buscarConta(ContaReceber contaReceber) throws SQLException, OperacaoContaException;
+	public ContaReceber buscarConta(Long  id_conta) throws SQLException, OperacaoContaException;
 	
 	public List<ContaReceber> buscarTodas() throws SQLException, OperacaoContaException;
 

@@ -23,8 +23,8 @@ public class jdbcContaReceberDAO implements ContaReceberDAO {
 	
 	public void salvarConta(ContaReceber contaReceber) throws SQLException {
 		String sql = String.format("insert into conta_receber (id_pessoa, conta_descricao, conta_valor, conta_vencimento, conta_situacao)"
-				+ "values (%d, '%s', %d, '%s', 's%')", contaReceber.getCliente().getId(), contaReceber.getDescricao(), contaReceber.getValor()
-				, contaReceber.getDataVencimento(), contaReceber.getSituacaoconta());
+				+ "values (%d, '%s', %.2f, '" + contaReceber.getDataVencimento() + "', '%s')", contaReceber.getCliente().getId(), contaReceber.getDescricao()
+				, contaReceber.getValor(), contaReceber.getSituacaoconta());
 		PreparedStatement ps = this.connection.prepareStatement(sql);
 		ps.executeUpdate();
 		this.connection.close();
@@ -38,7 +38,7 @@ public class jdbcContaReceberDAO implements ContaReceberDAO {
 		ResultSet rs = ps.executeQuery();
 		
 		while (rs.next()) {
-			if (rs.getString("conta_situacao") == "PENDENTE" || rs.getString("conta_situacao") == "CANCELADA") {
+			if (rs.getString("conta_situacao").equalsIgnoreCase("PAGA") || rs.getString("conta_situacao").equalsIgnoreCase("CANCELADA")) {
 				throw new OperacaoContaException("Conta não pode ser recebida.");
 			}
 			String updateSql = String.format("UPDATE conta_receber SET conta_situacao = 'PAGA' WHERE id_conta_receber = %d;", id_conta);
@@ -51,12 +51,12 @@ public class jdbcContaReceberDAO implements ContaReceberDAO {
 	}
 
 	
-	public ContaReceber buscarConta(ContaReceber contaReceber) throws SQLException {
-		String sql = String.format("select * from conta_receber"
-				+ "where id_conta_receber = %d;", contaReceber.getId());
+	public ContaReceber buscarConta(Long  id_conta) throws SQLException {
+		String sql = String.format("select * from conta_receber where id_conta_receber = %d;", id_conta);
 		PreparedStatement ps = this.connection.prepareStatement(sql);
 		ResultSet rs = ps.executeQuery();
-
+		ContaReceber contaReceber = new ContaReceber();
+		
 		while (rs.next()) {
 			contaReceber.setDataVencimento(rs.getDate("conta_vencimento"));
 			contaReceber.setDescricao(rs.getString("conta_descricao"));
@@ -97,7 +97,7 @@ public class jdbcContaReceberDAO implements ContaReceberDAO {
 		ResultSet rs = ps.executeQuery();
 		
 		while (rs.next()) {
-			if (rs.getString("conta_situacao") == "PAGA" || rs.getString("conta_situacao") == "CANCELADA") {
+			if (rs.getString("conta_situacao").equalsIgnoreCase("PAGA") || rs.getString("conta_situacao").equalsIgnoreCase("CANCELADA")) {
 				throw new OperacaoContaException("Conta não pode ser cancelada.");
 			}
 			String updateSql = String.format("UPDATE conta_receber SET conta_situacao = 'CANCELADA' WHERE id_conta_receber = %d;", id_conta);

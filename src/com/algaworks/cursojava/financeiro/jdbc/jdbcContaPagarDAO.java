@@ -37,7 +37,7 @@ public class jdbcContaPagarDAO implements ContaPagarDAO{
 		ResultSet rs = ps.executeQuery();
 		
 		while (rs.next()) {
-			if (rs.getString("conta_situacao") == "PENDENTE" || rs.getString("conta_situacao") == "CANCELADA") {
+			if (rs.getString("conta_situacao").equalsIgnoreCase("PAGA") || rs.getString("conta_situacao").equalsIgnoreCase("CANCELADA")) {
 				throw new OperacaoContaException("Conta não pode ser paga.");
 				
 			}
@@ -58,7 +58,7 @@ public class jdbcContaPagarDAO implements ContaPagarDAO{
 		ResultSet rs = ps.executeQuery();
 		
 		while (rs.next()) {
-			if (rs.getString("conta_situacao") == "PAGA" || rs.getString("conta_situacao") == "CANCELADA") {
+			if (rs.getString("conta_situacao").equalsIgnoreCase("PAGA")  || rs.getString("conta_situacao").equalsIgnoreCase("CANCELADA")) {
 				throw new OperacaoContaException("Conta não pode ser cancelada.");
 			}
 			String updateSql = String.format("UPDATE conta_pagar SET conta_situacao = 'CANCELADA' WHERE id_conta_pagar = %d;", id_conta);
@@ -72,13 +72,13 @@ public class jdbcContaPagarDAO implements ContaPagarDAO{
 	}
 
 	
-	public ContaPagar buscarConta(ContaPagar contaPagar) throws SQLException {
+	public ContaPagar buscarConta(Long id_conta) throws SQLException {
 	
-		String sql = String.format("select * from conta_pagar"
-				+ "where id_conta_pagar = %d;", contaPagar.getId());
+		String sql = String.format("select * from conta_pagar where id_conta_pagar = %d;", id_conta);
 		PreparedStatement ps = this.connection.prepareStatement(sql);
 		ResultSet rs = ps.executeQuery();
-
+		ContaPagar contaPagar = new ContaPagar();
+		
 		while (rs.next()) {
 			contaPagar.setDataVencimento(rs.getDate("conta_vencimento"));
 			contaPagar.setDescricao(rs.getString("conta_descricao"));
